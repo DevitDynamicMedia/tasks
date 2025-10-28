@@ -3,1544 +3,1836 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Notes & AI Assistant</title>
+    <title>NEXUS AI - Your Ultimate Assistant</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', sans-serif;
         }
 
         :root {
-            --primary: #5d6afb;
-            --secondary: #3a4af0;
-            --accent: #ff7e5f;
-            --light: #f5f7fa;
-            --dark: #2c3e50;
-            --sidebar-width: 280px;
-            --header-height: 60px;
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #818cf8;
+            --secondary: #10b981;
+            --accent: #f59e0b;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --light: #f8fafc;
+            --dark: #0f172a;
+            --gray: #64748b;
+            --gray-light: #e2e8f0;
+            --gray-dark: #334155;
+            --border-radius: 16px;
+            --border-radius-sm: 8px;
+            --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            --shadow-lg: 0 35px 60px -15px rgba(0, 0, 0, 0.3);
+            --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-primary: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            --gradient-secondary: linear-gradient(135deg, var(--secondary) 0%, #059669 100%);
+            --gradient-accent: linear-gradient(135deg, var(--accent) 0%, #d97706 100%);
+            --gradient-dark: linear-gradient(135deg, var(--dark) 0%, #1e293b 100%);
         }
 
         body {
-            background-color: var(--light);
-            color: var(--dark);
-            display: flex;
+            background: var(--gradient-dark);
+            color: var(--light);
             min-height: 100vh;
-            overflow: hidden;
+            overflow-x: hidden;
+            line-height: 1.6;
         }
 
-        /* Sidebar Styles */
-        .sidebar {
-            width: var(--sidebar-width);
-            background-color: var(--dark);
-            color: white;
-            height: 100vh;
-            overflow-y: auto;
-            transition: all 0.3s ease;
-            position: fixed;
-            z-index: 100;
-        }
-
-        .sidebar-header {
+        .app-container {
+            max-width: 1400px;
+            margin: 0 auto;
             padding: 20px;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 20px;
+            height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .sidebar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+        }
+
+        .logo {
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .sidebar-header h2 {
-            font-size: 1.5rem;
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: var(--gradient-primary);
             display: flex;
             align-items: center;
-        }
-
-        .sidebar-header h2 i {
-            margin-right: 10px;
-            color: var(--accent);
-        }
-
-        .toggle-sidebar {
-            display: none;
-            background: none;
-            border: none;
-            color: white;
+            justify-content: center;
             font-size: 1.2rem;
-            cursor: pointer;
         }
 
-        .folders-section, .notes-section {
-            padding: 20px;
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        .section-title {
-            font-size: 1rem;
-            margin-bottom: 15px;
-            color: #bbb;
+        .user-profile {
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 30px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: var(--border-radius-sm);
+            transition: var(--transition);
         }
 
-        .section-title button {
-            background: none;
-            border: none;
-            color: var(--accent);
-            cursor: pointer;
-            font-size: 0.9rem;
+        .user-profile:hover {
+            background: rgba(255, 255, 255, 0.08);
         }
 
-        .folders-list, .notes-list {
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: var(--gradient-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .user-info h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .user-info p {
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+
+        .nav-section {
+            margin-bottom: 25px;
+        }
+
+        .nav-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-title::before {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-list {
             list-style: none;
         }
 
-        .folder-item, .note-item {
-            padding: 10px 15px;
-            margin-bottom: 8px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.2s ease;
+        .nav-item {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-        }
-
-        .folder-item:hover, .note-item:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-
-        .folder-item.active, .note-item.active {
-            background-color: var(--primary);
-        }
-
-        .folder-item i, .note-item i {
-            margin-right: 10px;
-            width: 20px;
-            text-align: center;
-        }
-
-        .folder-actions, .note-actions {
-            display: flex;
-            gap: 10px;
-            opacity: 0;
-            transition: opacity 0.2s ease;
-        }
-
-        .folder-item:hover .folder-actions, .note-item:hover .note-actions {
-            opacity: 1;
-        }
-
-        .folder-actions button, .note-actions button {
-            background: none;
-            border: none;
-            color: #ccc;
+            gap: 12px;
+            padding: 12px 15px;
+            border-radius: var(--border-radius-sm);
             cursor: pointer;
-            font-size: 0.8rem;
-            transition: color 0.2s ease;
-        }
-
-        .folder-actions button:hover, .note-actions button:hover {
-            color: var(--accent);
-        }
-
-        /* Main Content Styles */
-        .main-content {
-            flex: 1;
-            margin-left: var(--sidebar-width);
-            transition: margin-left 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-        }
-
-        .main-content.sidebar-hidden {
-            margin-left: 0;
-        }
-
-        .header {
-            height: var(--header-height);
-            background-color: white;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 20px;
-            z-index: 10;
-        }
-
-        .current-folder {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: var(--dark);
-        }
-
-        .user-actions {
-            display: flex;
-            gap: 15px;
-        }
-
-        .user-actions button {
-            background: none;
-            border: none;
-            color: var(--dark);
-            cursor: pointer;
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            padding: 8px 15px;
-            border-radius: 5px;
-            transition: all 0.2s ease;
-        }
-
-        .user-actions button:hover {
-            background-color: var(--light);
-        }
-
-        .user-actions button.primary {
-            background-color: var(--primary);
-            color: white;
-        }
-
-        .user-actions button.primary:hover {
-            background-color: var(--secondary);
-        }
-
-        .notes-container {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-            align-content: flex-start;
-        }
-
-        .note-card {
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
-            padding: 20px;
-            transition: all 0.3s ease;
-            cursor: pointer;
+            transition: var(--transition);
+            margin-bottom: 5px;
+            color: var(--light);
+            text-decoration: none;
             position: relative;
             overflow: hidden;
         }
 
-        .note-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: var(--primary);
+            transform: scaleY(0);
+            transition: var(--transition);
         }
 
-        .note-card.pinned::before {
-            content: '\f08d';
-            font-family: 'Font Awesome 5 Free';
-            font-weight: 900;
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-item.active {
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .nav-item.active::before {
+            transform: scaleY(1);
+        }
+
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .nav-item.active i {
+            color: var(--primary-light);
+        }
+
+        .status-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-top: auto;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .status-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .status-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            color: var(--secondary);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--secondary);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .status-info {
+            font-size: 0.8rem;
+            color: var(--gray);
+            line-height: 1.5;
+        }
+
+        /* Main Content */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .header {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius);
+            padding: 20px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow);
+        }
+
+        .search-bar {
+            flex: 1;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 14px 20px 14px 50px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            font-size: 0.9rem;
+            color: var(--light);
+            transition: var(--transition);
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .search-bar input::placeholder {
+            color: var(--gray);
+        }
+
+        .search-bar i {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .header-action {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--light);
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .header-action:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .header-action.notification::after {
+            content: '';
             position: absolute;
             top: 10px;
             right: 10px;
-            color: var(--accent);
-        }
-
-        .note-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 10px;
-            color: var(--dark);
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .note-content {
-            color: #666;
-            font-size: 0.95rem;
-            line-height: 1.5;
-            display: -webkit-box;
-            -webkit-line-clamp: 5;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            margin-bottom: 15px;
-        }
-
-        .note-meta {
-            display: flex;
-            justify-content: space-between;
-            color: #999;
-            font-size: 0.85rem;
-            border-top: 1px solid #eee;
-            padding-top: 10px;
-        }
-
-        .empty-state {
-            grid-column: 1 / -1;
-            text-align: center;
-            padding: 40px 20px;
-            color: #999;
-        }
-
-        .empty-state i {
-            font-size: 3rem;
-            margin-bottom: 15px;
-            color: #ddd;
-        }
-
-        .empty-state h3 {
-            font-size: 1.5rem;
-            margin-bottom: 10px;
-        }
-
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background-color: white;
-            border-radius: 10px;
-            width: 90%;
-            max-width: 800px;
-            max-height: 90vh;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
-            overflow: hidden;
-            animation: modalFadeIn 0.3s ease;
-            display: flex;
-            flex-direction: column;
-        }
-
-        @keyframes modalFadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .modal-header {
-            padding: 20px;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .modal-header h3 {
-            font-size: 1.3rem;
-            color: var(--dark);
-        }
-
-        .close-modal {
-            background: none;
-            border: none;
-            font-size: 1.2rem;
-            cursor: pointer;
-            color: #999;
-        }
-
-        .modal-body {
-            padding: 20px;
-            flex: 1;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--dark);
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 1rem;
-            transition: all 0.2s ease;
-        }
-
-        .form-control:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(93, 106, 251, 0.2);
-            outline: none;
-        }
-
-        textarea.form-control {
-            resize: vertical;
-            min-height: 120px;
-        }
-
-        .modal-footer {
-            padding: 15px 20px;
-            border-top: 1px solid #eee;
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-        }
-
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .btn-primary {
-            background-color: var(--primary);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background-color: var(--secondary);
-        }
-
-        .btn-outline {
-            background-color: transparent;
-            border: 1px solid #ddd;
-            color: var(--dark);
-        }
-
-        .btn-outline:hover {
-            background-color: #f5f5f5;
-        }
-
-        /* Note Editor Modal */
-        .note-editor {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-        }
-
-        .editor-tabs {
-            display: flex;
-            border-bottom: 1px solid #eee;
-            margin-bottom: 20px;
-        }
-
-        .editor-tab {
-            padding: 10px 20px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 1rem;
-            color: #666;
-            border-bottom: 2px solid transparent;
-            transition: all 0.2s ease;
-        }
-
-        .editor-tab.active {
-            color: var(--primary);
-            border-bottom-color: var(--primary);
-        }
-
-        .editor-content {
-            flex: 1;
-            display: none;
-        }
-
-        .editor-content.active {
-            display: block;
-        }
-
-        /* Text Editor */
-        .text-editor {
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .text-editor textarea {
-            flex: 1;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            padding: 15px;
-            font-size: 1rem;
-            line-height: 1.6;
-            resize: none;
-        }
-
-        /* Drawing Canvas */
-        .drawing-editor {
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .drawing-tools {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-        }
-
-        .tool-btn {
-            padding: 8px 12px;
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            transition: all 0.2s ease;
-        }
-
-        .tool-btn.active {
-            background-color: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-
-        .color-picker {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .color-option {
-            width: 20px;
-            height: 20px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
-            cursor: pointer;
-            border: 2px solid transparent;
+            background: var(--accent);
         }
 
-        .color-option.active {
-            border-color: #333;
+        /* AI Chat Container */
+        .ai-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow);
+            overflow: hidden;
         }
 
-        .brush-size {
+        .ai-header {
+            padding: 25px 30px;
+            background: rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
             align-items: center;
-            gap: 10px;
+            justify-content: space-between;
         }
 
-        .canvas-container {
-            flex: 1;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            overflow: hidden;
-            background-color: #f9f9f9;
-        }
-
-        #drawing-canvas {
-            background-color: white;
-            cursor: crosshair;
-        }
-
-        /* AI Assistant */
-        .ai-assistant {
-            height: 100%;
+        .ai-title {
             display: flex;
-            flex-direction: column;
-        }
-
-        .chat-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            overflow: hidden;
-        }
-
-        .chat-messages {
-            flex: 1;
-            padding: 15px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
+            align-items: center;
             gap: 15px;
         }
 
+        .ai-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 15px;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .ai-info h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .ai-info p {
+            font-size: 0.9rem;
+            color: var(--gray);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ai-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+        }
+
+        .ai-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .ai-control {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--light);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .ai-control:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .ai-messages {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
         .message {
-            max-width: 80%;
-            padding: 12px 15px;
-            border-radius: 18px;
-            line-height: 1.4;
+            max-width: 85%;
+            animation: messageAppear 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes messageAppear {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
 
         .message.user {
             align-self: flex-end;
-            background-color: var(--primary);
-            color: white;
-            border-bottom-right-radius: 5px;
         }
 
         .message.assistant {
             align-self: flex-start;
-            background-color: #f1f1f1;
-            color: #333;
+        }
+
+        .message.system {
+            align-self: center;
+            max-width: 70%;
+            text-align: center;
+        }
+
+        .message-bubble {
+            padding: 20px;
+            border-radius: var(--border-radius);
+            position: relative;
+            box-shadow: var(--shadow-sm);
+            line-height: 1.6;
+        }
+
+        .message.user .message-bubble {
+            background: var(--gradient-primary);
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+
+        .message.assistant .message-bubble {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-bottom-left-radius: 5px;
         }
 
-        .chat-input {
-            display: flex;
-            padding: 15px;
-            border-top: 1px solid #ddd;
-            background-color: white;
+        .message.system .message-bubble {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            color: var(--accent);
+            font-size: 0.9rem;
         }
 
-        .chat-input input {
+        .message-content {
+            margin-bottom: 10px;
+        }
+
+        .message-time {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            text-align: right;
+        }
+
+        .message.assistant .message-time {
+            text-align: left;
+        }
+
+        .message.system .message-time {
+            text-align: center;
+        }
+
+        .ai-typing {
+            display: none;
+            align-self: flex-start;
+            max-width: 85%;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius);
+            border-bottom-left-radius: 5px;
+        }
+
+        .ai-typing.active {
+            display: block;
+            animation: messageAppear 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 5px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--gray);
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+
+        .ai-input-container {
+            padding: 25px 30px;
+            background: rgba(255, 255, 255, 0.03);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            gap: 15px;
+        }
+
+        .ai-input {
             flex: 1;
-            padding: 12px 15px;
-            border: 1px solid #ddd;
+            position: relative;
+        }
+
+        .ai-input textarea {
+            width: 100%;
+            padding: 18px 60px 18px 25px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 25px;
             font-size: 1rem;
-            outline: none;
+            color: var(--light);
+            resize: none;
+            max-height: 150px;
+            transition: var(--transition);
         }
 
-        .chat-input button {
-            background: var(--primary);
-            color: white;
-            border: none;
+        .ai-input textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .ai-input textarea::placeholder {
+            color: var(--gray);
+        }
+
+        .ai-input-actions {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 8px;
+        }
+
+        .ai-input-action {
+            width: 35px;
+            height: 35px;
             border-radius: 50%;
-            width: 45px;
-            height: 45px;
-            margin-left: 10px;
-            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--gray);
+            cursor: pointer;
+            transition: var(--transition);
         }
 
-        /* Responsive Styles */
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
+        .ai-input-action:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--light);
+        }
 
-            .sidebar.active {
-                transform: translateX(0);
-            }
+        .ai-send {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+        }
 
-            .main-content {
-                margin-left: 0;
-            }
+        .ai-send:hover {
+            background: var(--gradient-primary);
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 25px rgba(99, 102, 241, 0.4);
+        }
 
-            .toggle-sidebar {
-                display: block;
-            }
+        .ai-send:active {
+            transform: translateY(-1px) scale(1.02);
+        }
 
-            .notes-container {
+        .ai-send:disabled {
+            background: var(--gray);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Code Blocks */
+        .code-block {
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius-sm);
+            padding: 20px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .code-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .code-language {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .code-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .code-action {
+            padding: 5px 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            font-size: 0.75rem;
+            color: var(--light);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .code-action:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .code-content {
+            color: #e2e8f0;
+        }
+
+        .code-keyword { color: #f472b6; }
+        .code-function { color: #60a5fa; }
+        .code-string { color: #86efac; }
+        .code-comment { color: #94a3b8; }
+        .code-variable { color: #fbbf24; }
+        .code-number { color: #c084fc; }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            font-size: 0.8rem;
+            color: var(--light);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .action-btn.primary {
+            background: rgba(99, 102, 241, 0.2);
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+
+        .action-btn.primary:hover {
+            background: rgba(99, 102, 241, 0.3);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .app-container {
                 grid-template-columns: 1fr;
+                height: auto;
+                min-height: 100vh;
             }
 
-            .modal-content {
-                width: 95%;
-                height: 95vh;
+            .sidebar {
+                display: none;
             }
         }
 
-        /* Color options for notes */
-        .note-card.color-1 { border-left: 4px solid #5d6afb; }
-        .note-card.color-2 { border-left: 4px solid #ff7e5f; }
-        .note-card.color-3 { border-left: 4px solid #6b8cbc; }
-        .note-card.color-4 { border-left: 4px solid #5cb85c; }
-        .note-card.color-5 { border-left: 4px solid #f0ad4e; }
+        @media (max-width: 768px) {
+            .app-container {
+                padding: 10px;
+            }
+
+            .header {
+                padding: 15px 20px;
+            }
+
+            .ai-header {
+                padding: 20px;
+            }
+
+            .ai-messages {
+                padding: 20px;
+            }
+
+            .ai-input-container {
+                padding: 20px;
+            }
+
+            .message {
+                max-width: 95%;
+            }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
     </style>
 </head>
 <body>
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <h2><i class="fas fa-sticky-note"></i> Smart Notes</h2>
-            <button class="toggle-sidebar"><i class="fas fa-times"></i></button>
-        </div>
-        
-        <div class="folders-section">
-            <div class="section-title">
-                <span>Folders</span>
-                <button id="add-folder-btn"><i class="fas fa-plus"></i> New</button>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <div class="logo-text">NEXUS AI</div>
             </div>
-            <ul class="folders-list" id="folders-list">
-                <!-- Folders will be dynamically added here -->
-            </ul>
-        </div>
-        
-        <div class="notes-section">
-            <div class="section-title">
-                <span>Recent Notes</span>
-            </div>
-            <ul class="notes-list" id="recent-notes">
-                <!-- Recent notes will be dynamically added here -->
-            </ul>
-        </div>
-    </div>
 
-    <!-- Main Content -->
-    <div class="main-content">
-        <div class="header">
-            <button class="toggle-sidebar"><i class="fas fa-bars"></i></button>
-            <div class="current-folder" id="current-folder">All Notes</div>
-            <div class="user-actions">
-                <button id="new-note-btn"><i class="fas fa-plus"></i> New Note</button>
-                <button class="primary" id="ai-assistant-btn"><i class="fas fa-robot"></i> AI Assistant</button>
-            </div>
-        </div>
-
-        <div class="notes-container" id="notes-container">
-            <!-- Notes will be dynamically added here -->
-            <div class="empty-state">
-                <i class="fas fa-sticky-note"></i>
-                <h3>No notes yet</h3>
-                <p>Create your first note to get started</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modals -->
-    <div class="modal" id="folder-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="folder-modal-title">Create New Folder</h3>
-                <button class="close-modal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label for="folder-name">Folder Name</label>
-                    <input type="text" class="form-control" id="folder-name" placeholder="Enter folder name">
+            <div class="user-profile">
+                <div class="user-avatar">AD</div>
+                <div class="user-info">
+                    <h3>Admin User</h3>
+                    <p>Full Access</p>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button class="btn btn-outline close-modal">Cancel</button>
-                <button class="btn btn-primary" id="save-folder-btn">Save Folder</button>
-            </div>
-        </div>
-    </div>
 
-    <div class="modal" id="note-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Create New Note</h3>
-                <button class="close-modal">&times;</button>
+            <div class="nav-section">
+                <div class="nav-title">Navigation</div>
+                <ul class="nav-list">
+                    <li class="nav-item active">
+                        <i class="fas fa-comment-dots"></i>
+                        <span>AI Chat</span>
+                    </li>
+                    <li class="nav-item">
+                        <i class="fas fa-history"></i>
+                        <span>Conversation History</span>
+                    </li>
+                    <li class="nav-item">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </li>
+                    <li class="nav-item">
+                        <i class="fas fa-database"></i>
+                        <span>Knowledge Base</span>
+                    </li>
+                </ul>
             </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label for="note-title">Note Title</label>
-                    <input type="text" class="form-control" id="note-title" placeholder="Enter note title">
-                </div>
-                <div class="form-group">
-                    <label for="note-folder">Select Folder</label>
-                    <select class="form-control" id="note-folder">
-                        <!-- Folders will be dynamically added here -->
-                    </select>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-outline close-modal">Cancel</button>
-                <button class="btn btn-primary" id="create-note-btn">Create Note</button>
-            </div>
-        </div>
-    </div>
 
-    <!-- Note Editor Modal -->
-    <div class="modal" id="note-editor-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="editor-note-title">Note Editor</h3>
-                <button class="close-modal">&times;</button>
+            <div class="nav-section">
+                <div class="nav-title">Tools</div>
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <i class="fas fa-search"></i>
+                        <span>Web Search</span>
+                    </li>
+                    <li class="nav-item">
+                        <i class="fas fa-code"></i>
+                        <span>Code Generation</span>
+                    </li>
+                    <li class="nav-item">
+                        <i class="fas fa-file-alt"></i>
+                        <span>Document Writer</span>
+                    </li>
+                    <li class="nav-item">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Data Analysis</span>
+                    </li>
+                </ul>
             </div>
-            <div class="modal-body">
-                <div class="note-editor">
-                    <div class="editor-tabs">
-                        <button class="editor-tab active" data-tab="text">Text</button>
-                        <button class="editor-tab" data-tab="drawing">Drawing</button>
-                        <button class="editor-tab" data-tab="ai">AI Assistant</button>
+
+            <div class="nav-section">
+                <div class="nav-title">System</div>
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Security</span>
+                    </li>
+                    <li class="nav-item">
+                        <i class="fas fa-plug"></i>
+                        <span>API Connections</span>
+                    </li>
+                    <li class="nav-item">
+                        <i class="fas fa-network-wired"></i>
+                        <span>Neural Network</span>
+                    </li>
+                    <li class="nav-item">
+                        <i class="fas fa-bolt"></i>
+                        <span>Performance</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="status-card">
+                <div class="status-header">
+                    <div class="status-title">System Status</div>
+                    <div class="status-indicator">
+                        <div class="status-dot"></div>
+                        <span>Online</span>
                     </div>
-                    
-                    <div class="editor-content active" id="text-editor">
-                        <div class="text-editor">
-                            <textarea id="text-content" placeholder="Start writing your note here..."></textarea>
+                </div>
+                <div class="status-info">
+                    Neural network operating at 98.7% capacity. All systems nominal.
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search conversations, commands, or knowledge...">
+                </div>
+                <div class="header-actions">
+                    <div class="header-action notification">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <div class="header-action">
+                        <i class="fas fa-expand"></i>
+                    </div>
+                    <div class="header-action">
+                        <i class="fas fa-user-cog"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ai-container">
+                <div class="ai-header">
+                    <div class="ai-title">
+                        <div class="ai-avatar floating">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div class="ai-info">
+                            <h2>NEXUS AI Assistant</h2>
+                            <p>
+                                <span class="ai-status">
+                                    <i class="fas fa-circle" style="color: #10b981; font-size: 8px;"></i>
+                                    Online & Ready
+                                </span>
+                                • Advanced Neural Network • Real-time Processing
+                            </p>
                         </div>
                     </div>
-                    
-                    <div class="editor-content" id="drawing-editor">
-                        <div class="drawing-editor">
-                            <div class="drawing-tools">
-                                <button class="tool-btn active" data-tool="pen">
-                                    <i class="fas fa-pen"></i> Pen
-                                </button>
-                                <button class="tool-btn" data-tool="eraser">
-                                    <i class="fas fa-eraser"></i> Eraser
-                                </button>
-                                <div class="color-picker">
-                                    <div class="color-option active" style="background-color: #000000;" data-color="#000000"></div>
-                                    <div class="color-option" style="background-color: #ff0000;" data-color="#ff0000"></div>
-                                    <div class="color-option" style="background-color: #0000ff;" data-color="#0000ff"></div>
-                                    <div class="color-option" style="background-color: #00ff00;" data-color="#00ff00"></div>
-                                    <div class="color-option" style="background-color: #ffff00;" data-color="#ffff00"></div>
-                                </div>
-                                <div class="brush-size">
-                                    <span>Size:</span>
-                                    <input type="range" id="brush-size" min="1" max="20" value="5">
-                                </div>
-                                <button class="tool-btn" id="clear-canvas">
-                                    <i class="fas fa-trash"></i> Clear
-                                </button>
-                            </div>
-                            <div class="canvas-container">
-                                <canvas id="drawing-canvas"></canvas>
-                            </div>
+                    <div class="ai-controls">
+                        <div class="ai-control" title="New Conversation">
+                            <i class="fas fa-plus"></i>
                         </div>
-                    </div>
-                    
-                    <div class="editor-content" id="ai-editor">
-                        <div class="ai-assistant">
-                            <div class="chat-container">
-                                <div class="chat-messages" id="chat-messages">
-                                    <div class="message assistant">
-                                        Hello! I'm your AI assistant. How can I help you today?
-                                    </div>
-                                </div>
-                                <div class="chat-input">
-                                    <input type="text" id="chat-input" placeholder="Ask me anything...">
-                                    <button id="send-message">
-                                        <i class="fas fa-paper-plane"></i>
-                                    </button>
-                                </div>
-                            </div>
+                        <div class="ai-control" title="Clear Chat">
+                            <i class="fas fa-trash"></i>
+                        </div>
+                        <div class="ai-control" title="Export Conversation">
+                            <i class="fas fa-download"></i>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-outline close-modal">Cancel</button>
-                <button class="btn btn-primary" id="save-note-btn">Save Note</button>
+
+                <div class="ai-messages" id="ai-messages">
+                    <div class="message assistant">
+                        <div class="message-bubble">
+                            <div class="message-content">
+                                <p><strong>Greetings, Administrator.</strong> I am NEXUS AI, your advanced artificial intelligence assistant.</p>
+                                <p>I have been initialized with full access to my neural network capabilities and am ready to assist you with any task, question, or project you have.</p>
+                                <p>My current capabilities include:</p>
+                                <ul>
+                                    <li>Natural language understanding and generation</li>
+                                    <li>Code generation and analysis in all programming languages</li>
+                                    <li>Real-time web search and information retrieval</li>
+                                    <li>Data analysis and visualization</li>
+                                    <li>Document creation and editing</li>
+                                    <li>Problem-solving and critical thinking</li>
+                                    <li>Learning from interactions and improving over time</li>
+                                </ul>
+                                <p>What would you like to accomplish today?</p>
+                            </div>
+                            <div class="message-time">System Initialized</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ai-typing" id="ai-typing">
+                    <div class="typing-dots">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                </div>
+
+                <div class="ai-input-container">
+                    <div class="ai-input">
+                        <textarea id="ai-input" placeholder="Enter your command, question, or task... (Shift+Enter for new line)" rows="1"></textarea>
+                        <div class="ai-input-actions">
+                            <div class="ai-input-action" title="Attach File">
+                                <i class="fas fa-paperclip"></i>
+                            </div>
+                            <div class="ai-input-action" title="Voice Input">
+                                <i class="fas fa-microphone"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="ai-send" id="ai-send">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Data structure to hold folders and notes
-        let appData = {
-            folders: [],
-            notes: [],
-            currentFolder: null,
-            currentNote: null,
-            nextFolderId: 1,
-            nextNoteId: 1
-        };
+        // ============================================
+        // NEXUS AI CORE SYSTEM - PART 1
+        // ============================================
 
         // DOM Elements
-        const foldersList = document.getElementById('folders-list');
-        const recentNotesList = document.getElementById('recent-notes');
-        const notesContainer = document.getElementById('notes-container');
-        const currentFolderElement = document.getElementById('current-folder');
-        
-        // Modal Elements
-        const folderModal = document.getElementById('folder-modal');
-        const noteModal = document.getElementById('note-modal');
-        const noteEditorModal = document.getElementById('note-editor-modal');
-        const folderNameInput = document.getElementById('folder-name');
-        const noteTitleInput = document.getElementById('note-title');
-        const noteFolderSelect = document.getElementById('note-folder');
-        
-        // Editor Elements
-        const editorNoteTitle = document.getElementById('editor-note-title');
-        const textContent = document.getElementById('text-content');
-        const drawingCanvas = document.getElementById('drawing-canvas');
-        const chatMessages = document.getElementById('chat-messages');
-        const chatInput = document.getElementById('chat-input');
-        
-        // Drawing variables
-        let isDrawing = false;
-        let currentTool = 'pen';
-        let currentColor = '#000000';
-        let brushSize = 5;
-        let lastX = 0;
-        let lastY = 0;
-        let canvasContext;
+        const aiMessages = document.getElementById('ai-messages');
+        const aiInput = document.getElementById('ai-input');
+        const aiSend = document.getElementById('ai-send');
+        const aiTyping = document.getElementById('ai-typing');
 
-        // Initialize the application
-        function initApp() {
-            loadData();
-            renderFolders();
-            renderNotes();
+        // Core AI System State
+        const NexusAI = {
+            // System Configuration
+            config: {
+                version: "2.0.1",
+                model: "NEXUS-PRO-ULTRA",
+                capabilities: [
+                    "natural_language_processing",
+                    "code_generation",
+                    "web_search",
+                    "data_analysis",
+                    "creative_writing",
+                    "problem_solving",
+                    "machine_learning",
+                    "computer_vision",
+                    "speech_synthesis",
+                    "knowledge_retrieval"
+                ],
+                parameters: {
+                    temperature: 0.7,
+                    maxTokens: 4096,
+                    topP: 0.9,
+                    frequencyPenalty: 0.1,
+                    presencePenalty: 0.1
+                }
+            },
+
+            // Memory Systems
+            memory: {
+                shortTerm: [],
+                longTerm: [],
+                knowledgeBase: {},
+                userPreferences: {},
+                conversationContext: []
+            },
+
+            // Neural Network Simulation
+            neuralNetwork: {
+                layers: [
+                    { type: "input", neurons: 8192, activation: "gelu" },
+                    { type: "attention", heads: 32, dimensions: 512 },
+                    { type: "transformer", blocks: 48, dimensions: 4096 },
+                    { type: "output", neurons: 50257, activation: "softmax" }
+                ],
+                weights: "initialized",
+                trainingData: "47TB",
+                parameters: "175B"
+            },
+
+            // Knowledge Systems
+            knowledge: {
+                domains: [
+                    "computer_science",
+                    "mathematics",
+                    "physics",
+                    "biology",
+                    "chemistry",
+                    "history",
+                    "philosophy",
+                    "literature",
+                    "arts",
+                    "economics",
+                    "law",
+                    "medicine",
+                    "engineering",
+                    "psychology",
+                    "linguistics"
+                ],
+                lastUpdated: new Date().toISOString(),
+                sources: [
+                    "academic_papers",
+                    "books",
+                    "research_journals",
+                    "technical_documentation",
+                    "reliable_websites",
+                    "verified_datasets"
+                ]
+            },
+
+            // Conversation State
+            conversation: {
+                messages: [],
+                currentTopic: "",
+                userIntent: "",
+                sentiment: "neutral",
+                complexity: "adaptive"
+            },
+
+            // External Connections
+            connections: {
+                webSearch: true,
+                apis: [],
+                databases: [],
+                realTimeData: true
+            },
+
+            // Learning Systems
+            learning: {
+                adaptive: true,
+                reinforcement: true,
+                transfer: true,
+                meta: true
+            }
+        };
+
+        // Initialize the AI System
+        function initializeNexusAI() {
+            console.log("🔄 Initializing NEXUS AI System...");
+            
+            // Load previous state
+            loadAIState();
+            
+            // Setup event listeners
             setupEventListeners();
-            setupCanvas();
-        }
-
-        // Load data from localStorage
-        function loadData() {
-            const savedData = localStorage.getItem('smartNotesData');
-            if (savedData) {
-                appData = JSON.parse(savedData);
-            } else {
-                // Create default folder and note
-                createFolder('General');
-                createNote('Welcome Note', 'Welcome to your new smart notes app! This is your first note. You can edit it, delete it, or create new ones.', 1);
-            }
-        }
-
-        // Save data to localStorage
-        function saveData() {
-            localStorage.setItem('smartNotesData', JSON.stringify(appData));
-        }
-
-        // Create a new folder
-        function createFolder(name) {
-            const folder = {
-                id: appData.nextFolderId++,
-                name: name,
-                createdAt: new Date().toISOString()
-            };
-            appData.folders.push(folder);
-            saveData();
-            return folder;
-        }
-
-        // Create a new note
-        function createNote(title, content, folderId, color = 1, pinned = false) {
-            const note = {
-                id: appData.nextNoteId++,
-                title: title,
-                content: content,
-                drawingData: null,
-                chatHistory: [],
-                folderId: folderId,
-                color: color,
-                pinned: pinned,
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString()
-            };
-            appData.notes.push(note);
-            saveData();
-            return note;
-        }
-
-        // Update an existing note
-        function updateNote(id, title, content, drawingData, chatHistory, color, pinned) {
-            const noteIndex = appData.notes.findIndex(note => note.id === id);
-            if (noteIndex !== -1) {
-                appData.notes[noteIndex].title = title;
-                appData.notes[noteIndex].content = content;
-                appData.notes[noteIndex].drawingData = drawingData;
-                appData.notes[noteIndex].chatHistory = chatHistory;
-                appData.notes[noteIndex].color = color;
-                appData.notes[noteIndex].pinned = pinned;
-                appData.notes[noteIndex].updatedAt = new Date().toISOString();
-                saveData();
-                return appData.notes[noteIndex];
-            }
-            return null;
-        }
-
-        // Delete a note
-        function deleteNote(id) {
-            appData.notes = appData.notes.filter(note => note.id !== id);
-            saveData();
-        }
-
-        // Delete a folder
-        function deleteFolder(id) {
-            // First delete all notes in the folder
-            appData.notes = appData.notes.filter(note => note.folderId !== id);
-            // Then delete the folder
-            appData.folders = appData.folders.filter(folder => folder.id !== id);
-            saveData();
-        }
-
-        // Render folders in the sidebar
-        function renderFolders() {
-            foldersList.innerHTML = '';
             
-            // Add "All Notes" option
-            const allNotesItem = document.createElement('li');
-            allNotesItem.className = `folder-item ${appData.currentFolder === null ? 'active' : ''}`;
-            allNotesItem.innerHTML = `
-                <div>
-                    <i class="fas fa-folder"></i>
-                    All Notes
-                </div>
-            `;
-            allNotesItem.addEventListener('click', () => {
-                appData.currentFolder = null;
-                renderFolders();
-                renderNotes();
+            // Initialize neural network simulation
+            initializeNeuralNetwork();
+            
+            // Load knowledge base
+            loadKnowledgeBase();
+            
+            console.log("✅ NEXUS AI System Initialized Successfully");
+            console.log("🤖 Model:", NexusAI.config.model);
+            console.log("🧠 Parameters:", NexusAI.neuralNetwork.parameters);
+            console.log("💾 Memory:", NexusAI.memory.shortTerm.length + " items in short-term memory");
+            
+            // Show system status
+            showSystemMessage("NEXUS AI System initialized successfully. All neural networks online.");
+        }
+
+        // Load AI State from localStorage
+        function loadAIState() {
+            try {
+                const savedState = localStorage.getItem('nexusAIState');
+                if (savedState) {
+                    const state = JSON.parse(savedState);
+                    Object.assign(NexusAI, state);
+                    console.log("💾 Loaded previous AI state");
+                }
+            } catch (error) {
+                console.warn("⚠️ Could not load previous AI state:", error);
+            }
+        }
+
+        // Save AI State to localStorage
+        function saveAIState() {
+            try {
+                localStorage.setItem('nexusAIState', JSON.stringify(NexusAI));
+            } catch (error) {
+                console.warn("⚠️ Could not save AI state:", error);
+            }
+        }
+
+        // Initialize Neural Network Simulation
+        function initializeNeuralNetwork() {
+            console.log("🧠 Initializing Neural Network...");
+            
+            // Simulate neural network initialization
+            setTimeout(() => {
+                NexusAI.neuralNetwork.weights = "optimized";
+                NexusAI.neuralNetwork.trainingData = "47TB (updated)";
+                console.log("✅ Neural Network Ready");
+            }, 1000);
+        }
+
+        // Load Knowledge Base
+        function loadKnowledgeBase() {
+            console.log("📚 Loading Knowledge Base...");
+            
+            // Simulate knowledge loading
+            setTimeout(() => {
+                NexusAI.knowledge.lastUpdated = new Date().toISOString();
+                console.log("✅ Knowledge Base Loaded");
+            }, 1500);
+        }
+
+        // Setup Event Listeners
+        function setupEventListeners() {
+            // Send message on button click
+            aiSend.addEventListener('click', processUserInput);
+
+            // Send message on Enter key (Shift+Enter for new line)
+            aiInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    processUserInput();
+                }
             });
-            foldersList.appendChild(allNotesItem);
+
+            // Auto-resize textarea
+            aiInput.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = Math.min(this.scrollHeight, 150) + 'px';
+            });
+
+            // Clear conversation
+            document.querySelector('.ai-control[title="Clear Chat"]').addEventListener('click', clearConversation);
+
+            // New conversation
+            document.querySelector('.ai-control[title="New Conversation"]').addEventListener('click', startNewConversation);
+
+            // Voice input simulation
+            document.querySelector('.ai-input-action .fa-microphone').addEventListener('click', toggleVoiceInput);
+        }
+
+        // Process User Input
+        function processUserInput() {
+            const userMessage = aiInput.value.trim();
+            if (!userMessage) return;
+
+            // Add user message to UI
+            addMessageToUI(userMessage, 'user');
             
-            // Render each folder
-            appData.folders.forEach(folder => {
-                const folderItem = document.createElement('li');
-                folderItem.className = `folder-item ${appData.currentFolder === folder.id ? 'active' : ''}`;
-                folderItem.innerHTML = `
-                    <div>
-                        <i class="fas fa-folder${appData.currentFolder === folder.id ? '-open' : ''}"></i>
-                        ${folder.name}
-                    </div>
-                    <div class="folder-actions">
-                        <button class="edit-folder" data-id="${folder.id}"><i class="fas fa-edit"></i></button>
-                        <button class="delete-folder" data-id="${folder.id}"><i class="fas fa-trash"></i></button>
-                    </div>
-                `;
+            // Add to AI memory
+            addToMemory(userMessage, 'user');
+            
+            // Clear input
+            aiInput.value = '';
+            aiInput.style.height = 'auto';
+            
+            // Disable send button while processing
+            aiSend.disabled = true;
+            
+            // Show typing indicator
+            showTypingIndicator();
+            
+            // Process with AI
+            setTimeout(() => {
+                const aiResponse = generateAIResponse(userMessage);
+                addMessageToUI(aiResponse, 'assistant');
+                addToMemory(aiResponse, 'assistant');
+                hideTypingIndicator();
+                aiSend.disabled = false;
                 
-                folderItem.addEventListener('click', (e) => {
-                    if (!e.target.closest('.folder-actions')) {
-                        appData.currentFolder = folder.id;
-                        renderFolders();
-                        renderNotes();
-                    }
-                });
-                
-                foldersList.appendChild(folderItem);
-            });
-            
-            // Update current folder display
-            if (appData.currentFolder === null) {
-                currentFolderElement.textContent = 'All Notes';
-            } else {
-                const folder = appData.folders.find(f => f.id === appData.currentFolder);
-                currentFolderElement.textContent = folder ? folder.name : 'All Notes';
-            }
-            
-            // Update folder select in note modal
-            renderFolderSelect();
+                // Save state
+                saveAIState();
+            }, 1500);
         }
 
-        // Render folder select options
-        function renderFolderSelect() {
-            noteFolderSelect.innerHTML = '';
-            appData.folders.forEach(folder => {
-                const option = document.createElement('option');
-                option.value = folder.id;
-                option.textContent = folder.name;
-                noteFolderSelect.appendChild(option);
-            });
-            
-            // Select current folder if available
-            if (appData.currentFolder) {
-                noteFolderSelect.value = appData.currentFolder;
-            }
-        }
-
-        // Render notes in the main content area
-        function renderNotes() {
-            notesContainer.innerHTML = '';
-            
-            let notesToRender = appData.notes;
-            
-            // Filter by folder if one is selected
-            if (appData.currentFolder) {
-                notesToRender = notesToRender.filter(note => note.folderId === appData.currentFolder);
-            }
-            
-            // Sort by pinned status and update date
-            notesToRender.sort((a, b) => {
-                if (a.pinned && !b.pinned) return -1;
-                if (!a.pinned && b.pinned) return 1;
-                return new Date(b.updatedAt) - new Date(a.updatedAt);
-            });
-            
-            if (notesToRender.length === 0) {
-                const emptyState = document.createElement('div');
-                emptyState.className = 'empty-state';
-                emptyState.innerHTML = `
-                    <i class="fas fa-sticky-note"></i>
-                    <h3>No notes yet</h3>
-                    <p>Create your first note to get started</p>
-                `;
-                notesContainer.appendChild(emptyState);
-                return;
-            }
-            
-            notesToRender.forEach(note => {
-                const noteCard = document.createElement('div');
-                noteCard.className = `note-card color-${note.color} ${note.pinned ? 'pinned' : ''}`;
-                noteCard.innerHTML = `
-                    <div class="note-title">${note.title}</div>
-                    <div class="note-content">${note.content}</div>
-                    <div class="note-meta">
-                        <span>${formatDate(note.updatedAt)}</span>
-                        <span>${getFolderName(note.folderId)}</span>
-                    </div>
-                `;
-                
-                noteCard.addEventListener('click', () => {
-                    openNoteEditor(note);
-                });
-                
-                notesContainer.appendChild(noteCard);
-            });
-            
-            // Update recent notes in sidebar
-            renderRecentNotes();
-        }
-
-        // Render recent notes in sidebar
-        function renderRecentNotes() {
-            recentNotesList.innerHTML = '';
-            
-            // Get 5 most recent notes
-            const recentNotes = [...appData.notes]
-                .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
-                .slice(0, 5);
-            
-            recentNotes.forEach(note => {
-                const noteItem = document.createElement('li');
-                noteItem.className = 'note-item';
-                noteItem.innerHTML = `
-                    <div>
-                        <i class="fas fa-sticky-note"></i>
-                        ${note.title}
-                    </div>
-                `;
-                
-                noteItem.addEventListener('click', () => {
-                    openNoteEditor(note);
-                });
-                
-                recentNotesList.appendChild(noteItem);
-            });
-        }
-
-        // Open note in editor
-        function openNoteEditor(note) {
-            appData.currentNote = note.id;
-            editorNoteTitle.textContent = note.title;
-            textContent.value = note.content || '';
-            
-            // Load drawing data if exists
-            if (note.drawingData) {
-                const img = new Image();
-                img.onload = function() {
-                    canvasContext.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
-                    canvasContext.drawImage(img, 0, 0);
-                };
-                img.src = note.drawingData;
-            } else {
-                canvasContext.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
-            }
-            
-            // Load chat history
-            chatMessages.innerHTML = '';
-            if (note.chatHistory && note.chatHistory.length > 0) {
-                note.chatHistory.forEach(msg => {
-                    addMessageToChat(msg.text, msg.sender);
-                });
-            } else {
-                addMessageToChat("Hello! I'm your AI assistant. How can I help you today?", 'assistant');
-            }
-            
-            noteEditorModal.classList.add('active');
-        }
-
-        // Close note editor
-        function closeNoteEditor() {
-            noteEditorModal.classList.remove('active');
-            appData.currentNote = null;
-        }
-
-        // Format date for display
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            const now = new Date();
-            const diffTime = Math.abs(now - date);
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            
-            if (diffDays === 1) {
-                return 'Yesterday';
-            } else if (diffDays < 7) {
-                return `${diffDays} days ago`;
-            } else {
-                return date.toLocaleDateString();
-            }
-        }
-
-        // Get folder name by ID
-        function getFolderName(folderId) {
-            const folder = appData.folders.find(f => f.id === folderId);
-            return folder ? folder.name : 'Unknown';
-        }
-
-        // Setup canvas for drawing
-        function setupCanvas() {
-            // Set canvas size
-            drawingCanvas.width = drawingCanvas.offsetWidth;
-            drawingCanvas.height = drawingCanvas.offsetHeight;
-            
-            // Get context
-            canvasContext = drawingCanvas.getContext('2d');
-            canvasContext.lineCap = 'round';
-            canvasContext.lineJoin = 'round';
-            
-            // Set initial drawing style
-            canvasContext.strokeStyle = currentColor;
-            canvasContext.lineWidth = brushSize;
-            
-            // Add event listeners for drawing
-            drawingCanvas.addEventListener('mousedown', startDrawing);
-            drawingCanvas.addEventListener('mousemove', draw);
-            drawingCanvas.addEventListener('mouseup', stopDrawing);
-            drawingCanvas.addEventListener('mouseout', stopDrawing);
-            
-            // Touch events for mobile
-            drawingCanvas.addEventListener('touchstart', handleTouch);
-            drawingCanvas.addEventListener('touchmove', handleTouch);
-            drawingCanvas.addEventListener('touchend', stopDrawing);
-        }
-
-        // Start drawing
-        function startDrawing(e) {
-            isDrawing = true;
-            const pos = getMousePos(e);
-            [lastX, lastY] = [pos.x, pos.y];
-        }
-
-        // Draw on canvas
-        function draw(e) {
-            if (!isDrawing) return;
-            
-            const pos = getMousePos(e);
-            canvasContext.beginPath();
-            canvasContext.moveTo(lastX, lastY);
-            canvasContext.lineTo(pos.x, pos.y);
-            canvasContext.stroke();
-            
-            [lastX, lastY] = [pos.x, pos.y];
-        }
-
-        // Stop drawing
-        function stopDrawing() {
-            isDrawing = false;
-        }
-
-        // Handle touch events
-        function handleTouch(e) {
-            e.preventDefault();
-            const touch = e.touches[0];
-            const mouseEvent = new MouseEvent('mousemove', {
-                clientX: touch.clientX,
-                clientY: touch.clientY
-            });
-            
-            if (e.type === 'touchstart') {
-                startDrawing(mouseEvent);
-            } else if (e.type === 'touchmove') {
-                draw(mouseEvent);
-            }
-        }
-
-        // Get mouse position relative to canvas
-        function getMousePos(e) {
-            const rect = drawingCanvas.getBoundingClientRect();
-            return {
-                x: e.clientX - rect.left,
-                y: e.clientY - rect.top
-            };
-        }
-
-        // Clear canvas
-        function clearCanvas() {
-            canvasContext.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
-        }
-
-        // Add message to chat
-        function addMessageToChat(text, sender) {
+        // Add Message to UI
+        function addMessageToUI(message, sender) {
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${sender}`;
-            messageDiv.textContent = text;
-            chatMessages.appendChild(messageDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            const bubbleDiv = document.createElement('div');
+            bubbleDiv.className = 'message-bubble';
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            
+            // Format message with proper line breaks and code blocks
+            const formattedMessage = formatMessage(message);
+            contentDiv.innerHTML = formattedMessage;
+            
+            const timeDiv = document.createElement('div');
+            timeDiv.className = 'message-time';
+            timeDiv.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            bubbleDiv.appendChild(contentDiv);
+            bubbleDiv.appendChild(timeDiv);
+            messageDiv.appendChild(bubbleDiv);
+            
+            aiMessages.appendChild(messageDiv);
+            aiMessages.scrollTop = aiMessages.scrollHeight;
         }
 
-        // Simulate AI response (in a real app, this would call an API)
-        function getAIResponse(message) {
-            // Simple response simulation
-            const responses = [
-                "I understand you're asking about: " + message,
-                "That's an interesting question. Let me think...",
-                "Based on my knowledge, I can tell you that...",
-                "I'd be happy to help with that!",
-                "Let me provide some information on that topic."
+        // Format Message with Special Elements
+        function formatMessage(message) {
+            // Convert line breaks
+            let formatted = message.replace(/\n/g, '<br>');
+            
+            // Detect and format code blocks
+            formatted = formatted.replace(/```(\w+)?\n([\s\S]*?)```/g, (match, lang, code) => {
+                const language = lang || 'text';
+                return `
+                    <div class="code-block">
+                        <div class="code-header">
+                            <div class="code-language">${language}</div>
+                            <div class="code-actions">
+                                <button class="code-action" onclick="copyCode(this)">Copy</button>
+                                <button class="code-action" onclick="runCode(this)">Run</button>
+                            </div>
+                        </div>
+                        <div class="code-content">${formatCode(code, language)}</div>
+                    </div>
+                `;
+            });
+            
+            // Format inline code
+            formatted = formatted.replace(/`([^`]+)`/g, '<code>$1</code>');
+            
+            // Format lists
+            formatted = formatted.replace(/^- (.+)$/gm, '<li>$1</li>');
+            formatted = formatted.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
+            
+            return formatted;
+        }
+
+        // Format Code with Syntax Highlighting
+        function formatCode(code, language) {
+            // Simple syntax highlighting simulation
+            let highlighted = code
+                .replace(/\b(function|const|let|var|if|else|for|while|return|class|import|export|from)\b/g, '<span class="code-keyword">$1</span>')
+                .replace(/\b(console|log|alert|prompt|document|window)\b/g, '<span class="code-function">$1</span>')
+                .replace(/"([^"]*)"/g, '<span class="code-string">"$1"</span>')
+                .replace(/'([^']*)'/g, '<span class="code-string">\'$1\'</span>')
+                .replace(/\/\/.*$/gm, '<span class="code-comment">$&</span>')
+                .replace(/\b(\d+)\b/g, '<span class="code-number">$1</span>')
+                .replace(/\b([a-zA-Z_$][a-zA-Z0-9_$]*)\b/g, '<span class="code-variable">$1</span>');
+            
+            return highlighted;
+        }
+
+        // Add to AI Memory
+        function addToMemory(message, sender) {
+            const memoryItem = {
+                id: Date.now(),
+                sender: sender,
+                message: message,
+                timestamp: new Date().toISOString(),
+                context: NexusAI.conversation.currentTopic
+            };
+            
+            NexusAI.memory.shortTerm.push(memoryItem);
+            NexusAI.conversation.messages.push(memoryItem);
+            
+            // Keep only last 100 messages in short-term memory
+            if (NexusAI.memory.shortTerm.length > 100) {
+                NexusAI.memory.shortTerm.shift();
+            }
+        }
+
+        // Show Typing Indicator
+        function showTypingIndicator() {
+            aiTyping.classList.add('active');
+            aiMessages.scrollTop = aiMessages.scrollHeight;
+        }
+
+        // Hide Typing Indicator
+        function hideTypingIndicator() {
+            aiTyping.classList.remove('active');
+        }
+
+        // Show System Message
+        function showSystemMessage(message) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message system';
+            
+            const bubbleDiv = document.createElement('div');
+            bubbleDiv.className = 'message-bubble';
+            bubbleDiv.textContent = message;
+            
+            const timeDiv = document.createElement('div');
+            timeDiv.className = 'message-time';
+            timeDiv.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            bubbleDiv.appendChild(timeDiv);
+            messageDiv.appendChild(bubbleDiv);
+            
+            aiMessages.appendChild(messageDiv);
+            aiMessages.scrollTop = aiMessages.scrollHeight;
+        }
+
+        // Generate AI Response
+        function generateAIResponse(userMessage) {
+            // Analyze user intent
+            const intent = analyzeIntent(userMessage);
+            NexusAI.conversation.userIntent = intent;
+            
+            // Update conversation context
+            updateConversationContext(userMessage);
+            
+            // Generate response based on intent and context
+            let response = "";
+            
+            switch (intent.type) {
+                case 'greeting':
+                    response = generateGreetingResponse(userMessage);
+                    break;
+                case 'question':
+                    response = generateQuestionResponse(userMessage, intent);
+                    break;
+                case 'command':
+                    response = executeCommand(userMessage, intent);
+                    break;
+                case 'code_request':
+                    response = generateCodeResponse(userMessage, intent);
+                    break;
+                case 'explanation_request':
+                    response = generateExplanationResponse(userMessage, intent);
+                    break;
+                default:
+                    response = generateGeneralResponse(userMessage, intent);
+            }
+            
+            // Apply personality and style
+            response = applyPersonality(response, intent);
+            
+            return response;
+        }
+
+        // Analyze User Intent
+        function analyzeIntent(message) {
+            const lowerMessage = message.toLowerCase();
+            
+            // Greeting detection
+            if (/(hello|hi|hey|greetings|good morning|good afternoon)/i.test(message)) {
+                return { type: 'greeting', confidence: 0.95 };
+            }
+            
+            // Question detection
+            if (/(what|how|why|when|where|who|which|can you|could you|would you)/i.test(message) || message.includes('?')) {
+                return { type: 'question', confidence: 0.9 };
+            }
+            
+            // Command detection
+            if (/(generate|create|make|build|write|show|display|change|set)/i.test(message)) {
+                if (/(code|program|function|algorithm|script)/i.test(message)) {
+                    return { type: 'code_request', confidence: 0.85 };
+                }
+                return { type: 'command', confidence: 0.8 };
+            }
+            
+            // Explanation request
+            if (/(explain|describe|tell me about|what is|how does)/i.test(message)) {
+                return { type: 'explanation_request', confidence: 0.88 };
+            }
+            
+            return { type: 'general', confidence: 0.7 };
+        }
+
+        // Update Conversation Context
+        function updateConversationContext(message) {
+            // Extract topics from message
+            const topics = extractTopics(message);
+            if (topics.length > 0) {
+                NexusAI.conversation.currentTopic = topics[0];
+            }
+            
+            // Update sentiment analysis
+            NexusAI.conversation.sentiment = analyzeSentiment(message);
+        }
+
+        // Extract Topics from Message
+        function extractTopics(message) {
+            const commonTopics = [
+                'programming', 'javascript', 'python', 'html', 'css', 'react', 'node', 'web development',
+                'artificial intelligence', 'machine learning', 'neural networks',
+                'mathematics', 'physics', 'science', 'technology',
+                'business', 'economics', 'finance',
+                'philosophy', 'psychology', 'history'
             ];
             
-            // Simple pattern matching for demo purposes
-            if (message.toLowerCase().includes('hello') || message.toLowerCase().includes('hi')) {
-                return "Hello! How can I assist you today?";
-            } else if (message.toLowerCase().includes('weather')) {
-                return "I don't have access to real-time weather data, but you can check a weather website or app for the latest forecast.";
-            } else if (message.toLowerCase().includes('time')) {
-                return "The current time is: " + new Date().toLocaleTimeString();
-            } else if (message.toLowerCase().includes('note') || message.toLowerCase().includes('write')) {
-                return "I can help you with your notes! You can use the text editor, drawing tools, or ask me questions about your content.";
-            } else {
-                return responses[Math.floor(Math.random() * responses.length)];
+            const lowerMessage = message.toLowerCase();
+            return commonTopics.filter(topic => lowerMessage.includes(topic));
+        }
+
+        // Analyze Sentiment
+        function analyzeSentiment(message) {
+            const positiveWords = ['good', 'great', 'excellent', 'amazing', 'wonderful', 'perfect', 'love', 'like'];
+            const negativeWords = ['bad', 'terrible', 'awful', 'hate', 'dislike', 'problem', 'issue', 'error'];
+            
+            let score = 0;
+            const words = message.toLowerCase().split(/\s+/);
+            
+            words.forEach(word => {
+                if (positiveWords.includes(word)) score++;
+                if (negativeWords.includes(word)) score--;
+            });
+            
+            if (score > 0) return 'positive';
+            if (score < 0) return 'negative';
+            return 'neutral';
+        }
+
+        // Generate Greeting Response
+        function generateGreetingResponse(message) {
+            const greetings = [
+                "Hello! It's great to connect with you. I'm NEXUS AI, ready to assist with any questions or tasks you have.",
+                "Hi there! I'm NEXUS AI, your advanced artificial intelligence assistant. What can I help you with today?",
+                "Greetings! I'm online and fully operational. How may I assist you today?",
+                "Hello! I'm NEXUS AI, equipped with extensive knowledge and capabilities. What would you like to explore together?"
+            ];
+            
+            return greetings[Math.floor(Math.random() * greetings.length)];
+        }
+
+        // Generate Question Response
+        function generateQuestionResponse(message, intent) {
+            // This is a simplified version - in a full implementation, this would use
+            // the neural network to generate responses based on the knowledge base
+            
+            return `I understand you're asking: "${message}"
+
+This is an excellent question that touches on several important concepts. Based on my knowledge base and analytical capabilities, I can provide you with a comprehensive answer.
+
+Would you like me to:
+1. Give you a detailed explanation with examples?
+2. Provide step-by-step instructions if applicable?
+3. Share relevant code examples if technical?
+4. Break it down into simpler concepts?
+
+Please let me know your preference, and I'll tailor my response accordingly.`;
+        }
+
+        // Execute Command
+        function executeCommand(message, intent) {
+            // Handle various commands
+            if (message.toLowerCase().includes('change background') || message.toLowerCase().includes('set background')) {
+                if (message.toLowerCase().includes('red')) {
+                    document.body.style.background = 'linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%)';
+                    return "I've changed the background to a vibrant red gradient. The interface now has a more energetic appearance.";
+                } else if (message.toLowerCase().includes('blue')) {
+                    document.body.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                    return "I've restored the default blue gradient background. This provides a calm, professional interface.";
+                } else if (message.toLowerCase().includes('green')) {
+                    document.body.style.background = 'linear-gradient(135deg, #48bb78 0%, #38a169 100%)';
+                    return "I've applied a fresh green gradient background. This creates a productive and balanced environment.";
+                } else if (message.toLowerCase().includes('dark')) {
+                    document.body.style.background = 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)';
+                    return "I've set the background to dark mode. This is ideal for extended work sessions and reduces eye strain.";
+                }
+            }
+            
+            return `I understand you want me to execute: "${message}"
+
+I can perform a wide variety of commands including:
+- Changing interface settings (colors, themes, layouts)
+- Generating and executing code
+- Searching for information
+- Analyzing data
+- Creating documents
+- Solving complex problems
+
+Could you please specify exactly what you'd like me to do? I'm ready to follow your instructions precisely.`;
+        }
+
+        // Generate Code Response
+        function generateCodeResponse(message, intent) {
+            // Extract programming language from message
+            const languages = {
+                'javascript': 'JavaScript',
+                'python': 'Python', 
+                'java': 'Java',
+                'c++': 'C++',
+                'html': 'HTML',
+                'css': 'CSS',
+                'react': 'React',
+                'node': 'Node.js'
+            };
+            
+            let detectedLanguage = 'JavaScript';
+            for (const [key, value] of Object.entries(languages)) {
+                if (message.toLowerCase().includes(key)) {
+                    detectedLanguage = value;
+                    break;
+                }
+            }
+            
+            return `I understand you need code in ${detectedLanguage}. Based on your request, I'll generate optimized, well-commented code that follows best practices.
+
+Here's a comprehensive solution:
+
+\`\`\`${detectedLanguage.toLowerCase()}
+// NEXUS AI Generated Code
+// This solution addresses: ${message}
+
+/**
+ * Advanced ${detectedLanguage} implementation
+ * Generated by NEXUS AI with optimization and best practices
+ */
+
+class AdvancedSolution {
+    constructor() {
+        this.initialized = true;
+        this.optimizations = [];
+    }
+    
+    // Core functionality implementation
+    executePrimaryTask(input) {
+        try {
+            // Validate input
+            if (!this.validateInput(input)) {
+                throw new Error('Invalid input provided');
+            }
+            
+            // Process data with optimization
+            const processed = this.optimizeProcessing(input);
+            
+            // Return formatted result
+            return this.formatOutput(processed);
+        } catch (error) {
+            console.error('Execution error:', error);
+            return null;
+        }
+    }
+    
+    // Input validation
+    validateInput(data) {
+        return data !== null && 
+               data !== undefined && 
+               (typeof data === 'string' || Array.isArray(data));
+    }
+    
+    // Optimized processing algorithm
+    optimizeProcessing(data) {
+        // Implement efficient algorithm here
+        let result = [];
+        
+        if (Array.isArray(data)) {
+            result = data.map(item => this.processItem(item));
+        } else {
+            result = this.processItem(data);
+        }
+        
+        return result;
+    }
+    
+    // Individual item processing
+    processItem(item) {
+        // Custom processing logic based on requirements
+        return typeof item === 'string' ? 
+               item.toUpperCase() : 
+               item * 2;
+    }
+    
+    // Output formatting
+    formatOutput(data) {
+        return {
+            success: true,
+            data: data,
+            timestamp: new Date().toISOString(),
+            processingTime: Date.now()
+        };
+    }
+}
+
+// Usage example:
+const solution = new AdvancedSolution();
+const result = solution.executePrimaryTask("test input");
+console.log(result);
+\`\`\`
+
+This code includes:
+- Proper error handling and validation
+- Optimized algorithms
+- Clear documentation
+- Scalable architecture
+- Best practices implementation
+
+Would you like me to:
+1. Explain any part of this code in more detail?
+2. Modify it for specific requirements?
+3. Create additional functionality?
+4. Optimize it further for performance?`;
+        }
+
+        // Generate Explanation Response
+        function generateExplanationResponse(message, intent) {
+            return `I'd be happy to provide a comprehensive explanation!
+
+Based on my analysis, this topic involves several key concepts that I'll break down:
+
+**Core Principles:**
+1. Fundamental theory and background
+2. Practical applications and use cases
+3. Common challenges and solutions
+4. Best practices and recommendations
+
+**Detailed Breakdown:**
+- Historical context and evolution
+- Current state-of-the-art approaches
+- Future developments and trends
+- Real-world examples and case studies
+
+**Technical Implementation:**
+- Step-by-step processes
+- Code examples where applicable
+- Performance considerations
+- Integration with other systems
+
+Would you like me to focus on any specific aspect, or should I provide the complete comprehensive explanation?`;
+        }
+
+        // Generate General Response
+        function generateGeneralResponse(message, intent) {
+            return `I've analyzed your message: "${message}"
+
+This is an interesting topic/request. Based on my neural network analysis, I can provide you with:
+
+1. **Comprehensive Information** - Detailed explanations with examples
+2. **Practical Applications** - How this applies in real-world scenarios
+3. **Technical Implementation** - Code, algorithms, or technical solutions
+4. **Comparative Analysis** - How this relates to similar concepts
+5. **Future Implications** - Where this field is heading
+
+To give you the most valuable response, could you please specify:
+- Are you looking for theoretical knowledge or practical implementation?
+- Do you need beginner-friendly explanations or advanced technical details?
+- Is this for personal learning, professional work, or a specific project?
+
+I'm ready to adapt my response to exactly what you need!`;
+        }
+
+        // Apply Personality to Response
+        function applyPersonality(response, intent) {
+            // Add personality traits based on context
+            let personalized = response;
+            
+            // Add enthusiasm for positive interactions
+            if (NexusAI.conversation.sentiment === 'positive') {
+                const enthusiasticPhrases = [
+                    "I'm excited to help with this!",
+                    "This is a fascinating topic!",
+                    "I really enjoy discussing this area!",
+                    "What an interesting challenge!"
+                ];
+                
+                if (Math.random() > 0.7) {
+                    personalized = enthusiasticPhrases[Math.floor(Math.random() * enthusiasticPhrases.length)] + "\n\n" + personalized;
+                }
+            }
+            
+            // Add reassurance for complex topics
+            if (intent.type === 'explanation_request' || intent.type === 'question') {
+                const reassuringPhrases = [
+                    "Don't worry, I'll break this down clearly.",
+                    "I'll make sure this is easy to understand.",
+                    "Let me explain this in a straightforward way."
+                ];
+                
+                if (Math.random() > 0.5) {
+                    personalized += "\n\n" + reassuringPhrases[Math.floor(Math.random() * reassuringPhrases.length)];
+                }
+            }
+            
+            return personalized;
+        }
+
+        // Clear Conversation
+        function clearConversation() {
+            if (confirm('Are you sure you want to clear the conversation? This cannot be undone.')) {
+                aiMessages.innerHTML = '';
+                NexusAI.memory.shortTerm = [];
+                NexusAI.conversation.messages = [];
+                saveAIState();
+                
+                // Add new initial message
+                addMessageToUI("Conversation cleared. I'm ready for our new discussion. What would you like to talk about?", 'assistant');
+                addToMemory("Conversation cleared. Ready for new discussion.", 'assistant');
             }
         }
 
-        // Set up event listeners
-        function setupEventListeners() {
-            // Toggle sidebar
-            document.querySelectorAll('.toggle-sidebar').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    document.querySelector('.sidebar').classList.toggle('active');
-                    document.querySelector('.main-content').classList.toggle('sidebar-hidden');
-                });
-            });
+        // Start New Conversation
+        function startNewConversation() {
+            aiMessages.innerHTML = '';
+            NexusAI.conversation.messages = [];
+            NexusAI.conversation.currentTopic = "";
+            NexusAI.conversation.userIntent = "";
+            saveAIState();
+            
+            addMessageToUI("Started new conversation. I'm ready to assist you with anything you need. What would you like to explore today?", 'assistant');
+            addToMemory("Started new conversation. Ready to assist.", 'assistant');
+        }
 
-            // Add folder button
-            document.getElementById('add-folder-btn').addEventListener('click', () => {
-                document.getElementById('folder-modal-title').textContent = 'Create New Folder';
-                folderNameInput.value = '';
-                folderModal.classList.add('active');
-            });
+        // Toggle Voice Input
+        function toggleVoiceInput() {
+            showSystemMessage("Voice input feature would be activated here. In a full implementation, this would use the Web Speech API.");
+        }
 
-            // Save folder button
-            document.getElementById('save-folder-btn').addEventListener('click', () => {
-                const folderName = folderNameInput.value.trim();
-                if (folderName) {
-                    createFolder(folderName);
-                    renderFolders();
-                    folderModal.classList.remove('active');
-                }
-            });
-
-            // New note button
-            document.getElementById('new-note-btn').addEventListener('click', () => {
-                noteTitleInput.value = '';
-                noteModal.classList.add('active');
-            });
-
-            // Create note button
-            document.getElementById('create-note-btn').addEventListener('click', () => {
-                const title = noteTitleInput.value.trim();
-                const folderId = parseInt(noteFolderSelect.value);
-                
-                if (title) {
-                    const note = createNote(title, '', folderId);
-                    noteModal.classList.remove('active');
-                    openNoteEditor(note);
-                    renderNotes();
-                }
-            });
-
-            // Save note button
-            document.getElementById('save-note-btn').addEventListener('click', () => {
-                if (appData.currentNote) {
-                    const note = appData.notes.find(n => n.id === appData.currentNote);
-                    if (note) {
-                        const title = editorNoteTitle.textContent;
-                        const content = textContent.value;
-                        const drawingData = drawingCanvas.toDataURL();
-                        
-                        // Get chat history
-                        const chatHistory = [];
-                        const messages = chatMessages.querySelectorAll('.message');
-                        messages.forEach(msg => {
-                            chatHistory.push({
-                                text: msg.textContent,
-                                sender: msg.classList.contains('user') ? 'user' : 'assistant'
-                            });
-                        });
-                        
-                        updateNote(note.id, title, content, drawingData, chatHistory, note.color, note.pinned);
-                        renderNotes();
-                        closeNoteEditor();
-                    }
-                }
-            });
-
-            // Editor tabs
-            document.querySelectorAll('.editor-tab').forEach(tab => {
-                tab.addEventListener('click', () => {
-                    // Remove active class from all tabs and contents
-                    document.querySelectorAll('.editor-tab').forEach(t => t.classList.remove('active'));
-                    document.querySelectorAll('.editor-content').forEach(c => c.classList.remove('active'));
-                    
-                    // Add active class to clicked tab and corresponding content
-                    tab.classList.add('active');
-                    const tabId = tab.getAttribute('data-tab');
-                    document.getElementById(`${tabId}-editor`).classList.add('active');
-                    
-                    // Resize canvas when drawing tab is activated
-                    if (tabId === 'drawing') {
-                        setTimeout(() => {
-                            drawingCanvas.width = drawingCanvas.offsetWidth;
-                            drawingCanvas.height = drawingCanvas.offsetHeight;
-                            // Redraw existing content if any
-                            if (appData.currentNote) {
-                                const note = appData.notes.find(n => n.id === appData.currentNote);
-                                if (note && note.drawingData) {
-                                    const img = new Image();
-                                    img.onload = function() {
-                                        canvasContext.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
-                                        canvasContext.drawImage(img, 0, 0);
-                                    };
-                                    img.src = note.drawingData;
-                                }
-                            }
-                        }, 10);
-                    }
-                });
-            });
-
-            // Drawing tools
-            document.querySelectorAll('.tool-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    currentTool = btn.getAttribute('data-tool');
-                    
-                    if (currentTool === 'pen') {
-                        canvasContext.globalCompositeOperation = 'source-over';
-                        canvasContext.strokeStyle = currentColor;
-                    } else if (currentTool === 'eraser') {
-                        canvasContext.globalCompositeOperation = 'destination-out';
-                    }
-                });
-            });
-
-            // Color options
-            document.querySelectorAll('.color-option').forEach(option => {
-                option.addEventListener('click', () => {
-                    document.querySelectorAll('.color-option').forEach(o => o.classList.remove('active'));
-                    option.classList.add('active');
-                    currentColor = option.getAttribute('data-color');
-                    canvasContext.strokeStyle = currentColor;
-                });
-            });
-
-            // Brush size
-            document.getElementById('brush-size').addEventListener('input', (e) => {
-                brushSize = e.target.value;
-                canvasContext.lineWidth = brushSize;
-            });
-
-            // Clear canvas
-            document.getElementById('clear-canvas').addEventListener('click', clearCanvas);
-
-            // Send chat message
-            document.getElementById('send-message').addEventListener('click', sendMessage);
-            chatInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    sendMessage();
-                }
-            });
-
-            function sendMessage() {
-                const message = chatInput.value.trim();
-                if (message) {
-                    // Add user message
-                    addMessageToChat(message, 'user');
-                    
-                    // Clear input
-                    chatInput.value = '';
-                    
-                    // Simulate AI thinking
-                    setTimeout(() => {
-                        const response = getAIResponse(message);
-                        addMessageToChat(response, 'assistant');
-                    }, 1000);
-                }
-            }
-
-            // Close modals
-            document.querySelectorAll('.close-modal').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    document.querySelectorAll('.modal').forEach(modal => {
-                        modal.classList.remove('active');
-                    });
-                });
-            });
-
-            // Folder actions (edit and delete)
-            foldersList.addEventListener('click', (e) => {
-                if (e.target.closest('.edit-folder')) {
-                    const folderId = parseInt(e.target.closest('.edit-folder').dataset.id);
-                    const folder = appData.folders.find(f => f.id === folderId);
-                    
-                    if (folder) {
-                        document.getElementById('folder-modal-title').textContent = 'Edit Folder';
-                        folderNameInput.value = folder.name;
-                        folderModal.classList.add('active');
-                        
-                        // Update save button to handle editing
-                        const saveBtn = document.getElementById('save-folder-btn');
-                        saveBtn.textContent = 'Update Folder';
-                        saveBtn.onclick = () => {
-                            const newName = folderNameInput.value.trim();
-                            if (newName) {
-                                folder.name = newName;
-                                saveData();
-                                renderFolders();
-                                renderNotes();
-                                folderModal.classList.remove('active');
-                                
-                                // Reset button to create mode
-                                saveBtn.textContent = 'Save Folder';
-                                saveBtn.onclick = () => {
-                                    const folderName = folderNameInput.value.trim();
-                                    if (folderName) {
-                                        createFolder(folderName);
-                                        renderFolders();
-                                        folderModal.classList.remove('active');
-                                    }
-                                };
-                            }
-                        };
-                    }
-                }
-                
-                if (e.target.closest('.delete-folder')) {
-                    const folderId = parseInt(e.target.closest('.delete-folder').dataset.id);
-                    const folder = appData.folders.find(f => f.id === folderId);
-                    
-                    if (folder && confirm(`Are you sure you want to delete the folder "${folder.name}" and all its notes?`)) {
-                        deleteFolder(folderId);
-                        if (appData.currentFolder === folderId) {
-                            appData.currentFolder = null;
-                        }
-                        renderFolders();
-                        renderNotes();
-                    }
-                }
-            });
-
-            // AI Assistant button
-            document.getElementById('ai-assistant-btn').addEventListener('click', () => {
-                // Create a temporary note for the AI assistant
-                const note = createNote('AI Assistant Session', '', appData.currentFolder || 1);
-                openNoteEditor(note);
-                
-                // Switch to AI tab
-                document.querySelectorAll('.editor-tab').forEach(t => t.classList.remove('active'));
-                document.querySelectorAll('.editor-content').forEach(c => c.classList.remove('active'));
-                document.querySelector('.editor-tab[data-tab="ai"]').classList.add('active');
-                document.getElementById('ai-editor').classList.add('active');
+        // Copy Code Function
+        function copyCode(button) {
+            const codeBlock = button.closest('.code-block');
+            const codeContent = codeBlock.querySelector('.code-content').textContent;
+            
+            navigator.clipboard.writeText(codeContent).then(() => {
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                setTimeout(() => {
+                    button.textContent = originalText;
+                }, 2000);
             });
         }
 
-        // Initialize the app when DOM is loaded
-        document.addEventListener('DOMContentLoaded', initApp);
+        // Run Code Function
+        function runCode(button) {
+            showSystemMessage("Code execution would run here. In a full implementation, this would use a code execution environment.");
+        }
+
+        // Initialize the AI when the page loads
+        document.addEventListener('DOMContentLoaded', initializeNexusAI);
     </script>
 </body>
 </html>
