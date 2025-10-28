@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notes & Folders App</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #4a6fa5;
+            --secondary: #6b8cbc;
+            --accent: #ff7e5f;
+            --light: #f5f7fa;
+            --dark: #2c3e50;
+            --sidebar-width: 280px;
+            --header-height: 60px;
+        }
+
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            display: flex;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--dark);
+            color: white;
+            height: 100vh;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+            position: fixed;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar-header h2 i {
+            margin-right: 10px;
+            color: var(--accent);
+        }
+
+        .toggle-sidebar {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        .folders-section, .notes-section {
+            padding: 20px;
+        }
+
+        .section-title {
+            font-size: 1rem;
+            margin-bottom: 15px;
+            color: #bbb;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .section-title button {
+            background: none;
+            border: none;
+            color: var(--accent);
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .folders-list, .notes-list {
+            list-style: none;
+        }
+
+        .folder-item, .note-item {
+            padding: 10px 15px;
+            margin-bottom: 8px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .folder-item:hover, .note-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .folder-item.active, .note-item.active {
+            background-color: var(--primary);
+        }
+
+        .folder-item i, .note-item i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .folder-actions, .note-actions {
+            display: flex;
+            gap: 10px;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .folder-item:hover .folder-actions, .note-item:hover .note-actions {
+            opacity: 1;
+        }
+
+        .folder-actions button, .note-actions button {
+            background: none;
+            border: none;
+            color: #ccc;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: color 0.2s ease;
+        }
+
+        .folder-actions button:hover, .note-actions button:hover {
+            color: var(--accent);
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            transition: margin-left 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .main-content.sidebar-hidden {
+            margin-left: 0;
+        }
+
+        .header {
+            height: var(--header-height);
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 10;
+        }
+
+        .current-folder {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .user-actions button {
+            background: none;
+            border: none;
+            color: var(--dark);
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: all 0.2s ease;
+        }
+
+        .user-actions button:hover {
+            background-color: var(--light);
+        }
+
+        .user-actions button.primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .user-actions button.primary:hover {
+            background-color: var(--secondary);
+        }
+
+        .notes-container {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            align-content: flex-start;
+        }
+
+        .note-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            padding: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .note-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .note-card.pinned::before {
+            content: '\f08d';
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: var(--accent);
+        }
+
+        .note-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--dark);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .note-content {
+            color: #666;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 5;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .note-meta {
+            display: flex;
+            justify-content: space-between;
+            color: #999;
+            font-size: 0.85rem;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+        }
+
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #ddd;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-header h3 {
+            font-size: 1.3rem;
+            color: var(--dark);
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.2);
+            outline: none;
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .modal-footer {
+            padding: 15px 20px;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid #ddd;
+            color: var(--dark);
+        }
+
+        .btn-outline:hover {
+            background-color: #f5f5f5;
+        }
+
+        /* Editor Styles */
+        .editor-container {
+            display: none;
+            flex: 1;
+            padding: 20px;
+            background-color: white;
+            margin: 20px;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+        }
+
+        .editor-container.active {
+            display: block;
+        }
+
+        .editor-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .editor-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--dark);
+            border: none;
+            width: 100%;
+            padding: 5px 0;
+            margin-right: 15px;
+        }
+
+        .editor-title:focus {
+            outline: none;
+            border-bottom: 1px solid var(--primary);
+        }
+
+        .editor-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .editor-actions button {
+            background: none;
+            border: none;
+            font-size: 1.1rem;
+            cursor: pointer;
+            color: #666;
+            padding: 5px 10px;
+            border-radius: 3px;
+            transition: all 0.2s ease;
+        }
+
+        .editor-actions button:hover {
+            background-color: #f5f5f5;
+            color: var(--dark);
+        }
+
+        .editor-actions button.save-btn {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .editor-actions button.save-btn:hover {
+            background-color: var(--secondary);
+        }
+
+        .editor-content {
+            width: 100%;
+            min-height: 400px;
+            border: none;
+            font-size: 1rem;
+            line-height: 1.6;
+            resize: none;
+            padding: 10px 0;
+        }
+
+        .editor-content:focus {
+            outline: none;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .toggle-sidebar {
+                display: block;
+            }
+
+            .notes-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Color options for notes */
+        .note-card.color-1 { border-left: 4px solid #4a6fa5; }
+        .note-card.color-2 { border-left: 4px solid #ff7e5f; }
+        .note-card.color-3 { border-left: 4px solid #6b8cbc; }
+        .note-card.color-4 { border-left: 4px solid #5cb85c; }
+        .note-card.color-5 { border-left: 4px solid #f0ad4e; }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2><i class="fas fa-sticky-note"></i> Notes App</h2>
+            <button class="toggle-sidebar"><i class="fas fa-times"></i></button>
+        </div>
+        
+        <div class="folders-section">
+            <div class="section-title">
+                <span>Folders</span>
+                <button id="add-folder-btn"><i class="fas fa-plus"></i> New</button>
+            </div>
+            <ul class="folders-list" id="folders-list">
+                <!-- Folders will be dynamically added here -->
+            </ul>
+        </div>
+        
+        <div class="notes-section">
+            <div class="section-title">
+                <span>Recent Notes</span>
+            </div>
+            <ul class="notes-list" id="recent-notes">
+                <!-- Recent notes will be dynamically added here -->
+            </ul>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <button class="toggle-sidebar"><i class="fas fa-bars"></i></button>
+            <div class="current-folder" id="current-folder">All Notes</div>
+            <div class="user-actions">
+                <button id="new-note-btn"><i class="fas fa-plus"></i> New Note</button>
+                <button class="primary" id="search-btn"><i class="fas fa-search"></i> Search</button>
+            </div>
+        </div>
+
+        <div class="notes-container" id="notes-container">
+            <!-- Notes will be dynamically added here -->
+            <div class="empty-state">
+                <i class="fas fa-sticky-note"></i>
+                <h3>No notes yet</h3>
+                <p>Create your first note to get started</p>
+            </div>
+        </div>
+
+        <div class="editor-container" id="editor-container">
+            <div class="editor-header">
+                <input type="text" class="editor-title" id="editor-title" placeholder="Note Title">
+                <div class="editor-actions">
+                    <button id="pin-note-btn" title="Pin Note"><i class="far fa-bookmark"></i></button>
+                    <button id="color-note-btn" title="Change Color"><i class="fas fa-palette"></i></button>
+                    <button id="delete-note-btn" title="Delete Note"><i class="fas fa-trash"></i></button>
+                    <button class="save-btn" id="save-note-btn"><i class="fas fa-save"></i> Save</button>
+                </div>
+            </div>
+            <textarea class="editor-content" id="editor-content" placeholder="Start writing your note here..."></textarea>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div class="modal" id="folder-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="folder-modal-title">Create New Folder</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="folder-name">Folder Name</label>
+                    <input type="text" class="form-control" id="folder-name" placeholder="Enter folder name">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline close-modal">Cancel</button>
+                <button class="btn btn-primary" id="save-folder-btn">Save Folder</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="note-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Create New Note</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="note-title">Note Title</label>
+                    <input type="text" class="form-control" id="note-title" placeholder="Enter note title">
+                </div>
+                <div class="form-group">
+                    <label for="note-folder">Select Folder</label>
+                    <select class="form-control" id="note-folder">
+                        <!-- Folders will be dynamically added here -->
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline close-modal">Cancel</button>
+                <button class="btn btn-primary" id="create-note-btn">Create Note</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data structure to hold folders and notes
+        let appData = {
+            folders: [],
+            notes: [],
+            currentFolder: null,
+            currentNote: null,
+            nextFolderId: 1,
+            nextNoteId: 1
+        };
+
+        // DOM Elements
+        const foldersList = document.getElementById('folders-list');
+        const recentNotesList = document.getElementById('recent-notes');
+        const notesContainer = document.getElementById('notes-container');
+        const editorContainer = document.getElementById('editor-container');
+        const editorTitle = document.getElementById('editor-title');
+        const editorContent = document.getElementById('editor-content');
+        const currentFolderElement = document.getElementById('current-folder');
+        
+        // Modal Elements
+        const folderModal = document.getElementById('folder-modal');
+        const noteModal = document.getElementById('note-modal');
+        const folderNameInput = document.getElementById('folder-name');
+        const noteTitleInput = document.getElementById('note-title');
+        const noteFolderSelect = document.getElementById('note-folder');
+
+        // Initialize the application
+        function initApp() {
+            loadData();
+            renderFolders();
+            renderNotes();
+            setupEventListeners();
+        }
+
+        // Load data from localStorage
+        function loadData() {
+            const savedData = localStorage.getItem('notesAppData');
+            if (savedData) {
+                appData = JSON.parse(savedData);
+            } else {
+                // Create default folder and note
+                createFolder('General');
+                createNote('Welcome Note', 'Welcome to your new notes app! This is your first note. You can edit it, delete it, or create new ones.', 1);
+            }
+        }
+
+        // Save data to localStorage
+        function saveData() {
+            localStorage.setItem('notesAppData', JSON.stringify(appData));
+        }
+
+        // Create a new folder
+        function createFolder(name) {
+            const folder = {
+                id: appData.nextFolderId++,
+                name: name,
+                createdAt: new Date().toISOString()
+            };
+            appData.folders.push(folder);
+            saveData();
+            return folder;
+        }
+
+        // Create a new note
+        function createNote(title, content, folderId, color = 1, pinned = false) {
+            const note = {
+                id: appData.nextNoteId++,
+                title: title,
+                content: content,
+                folderId: folderId,
+                color: color,
+                pinned: pinned,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            };
+            appData.notes.push(note);
+            saveData();
+            return note;
+        }
+
+        // Update an existing note
+        function updateNote(id, title, content, color, pinned) {
+            const noteIndex = appData.notes.findIndex(note => note.id === id);
+            if (noteIndex !== -1) {
+                appData.notes[noteIndex].title = title;
+                appData.notes[noteIndex].content = content;
+                appData.notes[noteIndex].color = color;
+                appData.notes[noteIndex].pinned = pinned;
+                appData.notes[noteIndex].updatedAt = new Date().toISOString();
+                saveData();
+                return appData.notes[noteIndex];
+            }
+            return null;
+        }
+
+        // Delete a note
+        function deleteNote(id) {
+            appData.notes = appData.notes.filter(note => note.id !== id);
+            saveData();
+        }
+
+        // Delete a folder
+        function deleteFolder(id) {
+            // First delete all notes in the folder
+            appData.notes = appData.notes.filter(note => note.folderId !== id);
+            // Then delete the folder
+            appData.folders = appData.folders.filter(folder => folder.id !== id);
+            saveData();
+        }
+
+        // Render folders in the sidebar
+        function renderFolders() {
+            foldersList.innerHTML = '';
+            
+            // Add "All Notes" option
+            const allNotesItem = document.createElement('li');
+            allNotesItem.className = `folder-item ${appData.currentFolder === null ? 'active' : ''}`;
+            allNotesItem.innerHTML = `
+                <div>
+                    <i class="fas fa-folder"></i>
+                    All Notes
+                </div>
+            `;
+            allNotesItem.addEventListener('click', () => {
+                appData.currentFolder = null;
+                renderFolders();
+                renderNotes();
+            });
+            foldersList.appendChild(allNotesItem);
+            
+            // Render each folder
+            appData.folders.forEach(folder => {
+                const folderItem = document.createElement('li');
+                folderItem.className = `folder-item ${appData.currentFolder === folder.id ? 'active' : ''}`;
+                folderItem.innerHTML = `
+                    <div>
+                        <i class="fas fa-folder${appData.currentFolder === folder.id ? '-open' : ''}"></i>
+                        ${folder.name}
+                    </div>
+                    <div class="folder-actions">
+                        <button class="edit-folder" data-id="${folder.id}"><i class="fas fa-edit"></i></button>
+                        <button class="delete-folder" data-id="${folder.id}"><i class="fas fa-trash"></i></button>
+                    </div>
+                `;
+                
+                folderItem.addEventListener('click', (e) => {
+                    if (!e.target.closest('.folder-actions')) {
+                        appData.currentFolder = folder.id;
+                        renderFolders();
+                        renderNotes();
+                    }
+                });
+                
+                foldersList.appendChild(folderItem);
+            });
+            
+            // Update current folder display
+            if (appData.currentFolder === null) {
+                currentFolderElement.textContent = 'All Notes';
+            } else {
+                const folder = appData.folders.find(f => f.id === appData.currentFolder);
+                currentFolderElement.textContent = folder ? folder.name : 'All Notes';
+            }
+            
+            // Update folder select in note modal
+            renderFolderSelect();
+        }
+
+        // Render folder select options
+        function renderFolderSelect() {
+            noteFolderSelect.innerHTML = '';
+            appData.folders.forEach(folder => {
+                const option = document.createElement('option');
+                option.value = folder.id;
+                option.textContent = folder.name;
+                noteFolderSelect.appendChild(option);
+            });
+            
+            // Select current folder if available
+            if (appData.currentFolder) {
+                noteFolderSelect.value = appData.currentFolder;
+            }
+        }
+
+        // Render notes in the main content area
+        function renderNotes() {
+            notesContainer.innerHTML = '';
+            
+            let notesToRender = appData.notes;
+            
+            // Filter by folder if one is selected
+            if (appData.currentFolder) {
+                notesToRender = notesToRender.filter(note => note.folderId === appData.currentFolder);
+            }
+            
+            // Sort by pinned status and update date
+            notesToRender.sort((a, b) => {
+                if (a.pinned && !b.pinned) return -1;
+                if (!a.pinned && b.pinned) return 1;
+                return new Date(b.updatedAt) - new Date(a.updatedAt);
+            });
+            
+            if (notesToRender.length === 0) {
+                const emptyState = document.createElement('div');
+                emptyState.className = 'empty-state';
+                emptyState.innerHTML = `
+                    <i class="fas fa-sticky-note"></i>
+                    <h3>No notes yet</h3>
+                    <p>Create your first note to get started</p>
+                `;
+                notesContainer.appendChild(emptyState);
+                return;
+            }
+            
+            notesToRender.forEach(note => {
+                const noteCard = document.createElement('div');
+                noteCard.className = `note-card color-${note.color} ${note.pinned ? 'pinned' : ''}`;
+                noteCard.innerHTML = `
+                    <div class="note-title">${note.title}</div>
+                    <div class="note-content">${note.content}</div>
+                    <div class="note-meta">
+                        <span>${formatDate(note.updatedAt)}</span>
+                        <span>${getFolderName(note.folderId)}</span>
+                    </div>
+                `;
+                
+                noteCard.addEventListener('click', () => {
+                    openNoteEditor(note);
+                });
+                
+                notesContainer.appendChild(noteCard);
+            });
+            
+            // Update recent notes in sidebar
+            renderRecentNotes();
+        }
+
+        // Render recent notes in sidebar
+        function renderRecentNotes() {
+            recentNotesList.innerHTML = '';
+            
+            // Get 5 most recent notes
+            const recentNotes = [...appData.notes]
+                .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+                .slice(0, 5);
+            
+            recentNotes.forEach(note => {
+                const noteItem = document.createElement('li');
+                noteItem.className = 'note-item';
+                noteItem.innerHTML = `
+                    <div>
+                        <i class="fas fa-sticky-note"></i>
+                        ${note.title}
+                    </div>
+                `;
+                
+                noteItem.addEventListener('click', () => {
+                    openNoteEditor(note);
+                });
+                
+                recentNotesList.appendChild(noteItem);
+            });
+        }
+
+        // Open note in editor
+        function openNoteEditor(note) {
+            appData.currentNote = note.id;
+            editorTitle.value = note.title;
+            editorContent.value = note.content;
+            
+            // Set editor actions based on note properties
+            const pinBtn = document.getElementById('pin-note-btn');
+            pinBtn.innerHTML = note.pinned ? '<i class="fas fa-bookmark"></i>' : '<i class="far fa-bookmark"></i>';
+            
+            editorContainer.classList.add('active');
+            notesContainer.style.display = 'none';
+        }
+
+        // Close note editor
+        function closeNoteEditor() {
+            editorContainer.classList.remove('active');
+            notesContainer.style.display = 'grid';
+            appData.currentNote = null;
+        }
+
+        // Format date for display
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffTime = Math.abs(now - date);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            if (diffDays === 1) {
+                return 'Yesterday';
+            } else if (diffDays < 7) {
+                return `${diffDays} days ago`;
+            } else {
+                return date.toLocaleDateString();
+            }
+        }
+
+        // Get folder name by ID
+        function getFolderName(folderId) {
+            const folder = appData.folders.find(f => f.id === folderId);
+            return folder ? folder.name : 'Unknown';
+        }
+
+        // Set up event listeners
+        function setupEventListeners() {
+            // Toggle sidebar
+            document.querySelectorAll('.toggle-sidebar').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelector('.sidebar').classList.toggle('active');
+                    document.querySelector('.main-content').classList.toggle('sidebar-hidden');
+                });
+            });
+
+            // Add folder button
+            document.getElementById('add-folder-btn').addEventListener('click', () => {
+                document.getElementById('folder-modal-title').textContent = 'Create New Folder';
+                folderNameInput.value = '';
+                folderModal.classList.add('active');
+            });
+
+            // Save folder button
+            document.getElementById('save-folder-btn').addEventListener('click', () => {
+                const folderName = folderNameInput.value.trim();
+                if (folderName) {
+                    createFolder(folderName);
+                    renderFolders();
+                    folderModal.classList.remove('active');
+                }
+            });
+
+            // New note button
+            document.getElementById('new-note-btn').addEventListener('click', () => {
+                noteTitleInput.value = '';
+                noteModal.classList.add('active');
+            });
+
+            // Create note button
+            document.getElementById('create-note-btn').addEventListener('click', () => {
+                const title = noteTitleInput.value.trim();
+                const folderId = parseInt(noteFolderSelect.value);
+                
+                if (title) {
+                    const note = createNote(title, '', folderId);
+                    noteModal.classList.remove('active');
+                    openNoteEditor(note);
+                    renderNotes();
+                }
+            });
+
+            // Save note button
+            document.getElementById('save-note-btn').addEventListener('click', () => {
+                if (appData.currentNote) {
+                    const title = editorTitle.value.trim();
+                    const content = editorContent.value;
+                    const pinBtn = document.getElementById('pin-note-btn');
+                    const pinned = pinBtn.innerHTML.includes('fa-bookmark');
+                    const color = 1; // In a more advanced version, this would track the current color
+                    
+                    if (title) {
+                        updateNote(appData.currentNote, title, content, color, pinned);
+                        renderNotes();
+                        closeNoteEditor();
+                    }
+                }
+            });
+
+            // Pin note button
+            document.getElementById('pin-note-btn').addEventListener('click', () => {
+                const pinBtn = document.getElementById('pin-note-btn');
+                if (pinBtn.innerHTML.includes('far fa-bookmark')) {
+                    pinBtn.innerHTML = '<i class="fas fa-bookmark"></i>';
+                } else {
+                    pinBtn.innerHTML = '<i class="far fa-bookmark"></i>';
+                }
+            });
+
+            // Delete note button
+            document.getElementById('delete-note-btn').addEventListener('click', () => {
+                if (appData.currentNote && confirm('Are you sure you want to delete this note?')) {
+                    deleteNote(appData.currentNote);
+                    renderNotes();
+                    closeNoteEditor();
+                }
+            });
+
+            // Close modals
+            document.querySelectorAll('.close-modal').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.modal').forEach(modal => {
+                        modal.classList.remove('active');
+                    });
+                });
+            });
+
+            // Folder actions (edit and delete)
+            foldersList.addEventListener('click', (e) => {
+                if (e.target.closest('.edit-folder')) {
+                    const folderId = parseInt(e.target.closest('.edit-folder').dataset.id);
+                    const folder = appData.folders.find(f => f.id === folderId);
+                    
+                    if (folder) {
+                        document.getElementById('folder-modal-title').textContent = 'Edit Folder';
+                        folderNameInput.value = folder.name;
+                        folderModal.classList.add('active');
+                        
+                        // Update save button to handle editing
+                        const saveBtn = document.getElementById('save-folder-btn');
+                        saveBtn.textContent = 'Update Folder';
+                        saveBtn.onclick = () => {
+                            const newName = folderNameInput.value.trim();
+                            if (newName) {
+                                folder.name = newName;
+                                saveData();
+                                renderFolders();
+                                renderNotes();
+                                folderModal.classList.remove('active');
+                                
+                                // Reset button to create mode
+                                saveBtn.textContent = 'Save Folder';
+                                saveBtn.onclick = () => {
+                                    const folderName = folderNameInput.value.trim();
+                                    if (folderName) {
+                                        createFolder(folderName);
+                                        renderFolders();
+                                        folderModal.classList.remove('active');
+                                    }
+                                };
+                            }
+                        };
+                    }
+                }
+                
+                if (e.target.closest('.delete-folder')) {
+                    const folderId = parseInt(e.target.closest('.delete-folder').dataset.id);
+                    const folder = appData.folders.find(f => f.id === folderId);
+                    
+                    if (folder && confirm(`Are you sure you want to delete the folder "${folder.name}" and all its notes?`)) {
+                        deleteFolder(folderId);
+                        if (appData.currentFolder === folderId) {
+                            appData.currentFolder = null;
+                        }
+                        renderFolders();
+                        renderNotes();
+                    }
+                }
+            });
+
+            // Close editor when clicking outside (simplified)
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && editorContainer.classList.contains('active')) {
+                    closeNoteEditor();
+                }
+            });
+        }
+
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
